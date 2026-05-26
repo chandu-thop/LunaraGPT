@@ -61,3 +61,12 @@ Desktop.ini
 *.dump
 *.bak
 *.backup
+
+# Accidental backend duplicate files at repository root
+/index.js
+/package.json
+/package-lock.json
+/middleware/
+/models/
+/routes/
+/utils/
