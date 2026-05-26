@@ -1,0 +1,24 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  overflow: hidden;
+}
+
+.app {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, rgba(16, 24, 40, 0.94), rgba(7, 10, 18, 0.98)),
+    #070a12;
+}
