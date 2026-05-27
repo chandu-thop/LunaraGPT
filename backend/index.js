@@ -9,7 +9,12 @@ const authRoute=require("./routes/auth.js");
 const app = express();
 app.use(express.json());
 
-const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:5173")
+const defaultClientUrls = [
+    "http://localhost:5173",
+    "https://lunara-gpt.vercel.app",
+];
+
+const allowedOrigins = (process.env.CLIENT_URL || defaultClientUrls.join(","))
     .split(",")
     .map((origin) => origin.trim())
     .filter(Boolean);

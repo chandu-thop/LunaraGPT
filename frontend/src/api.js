@@ -1,9 +1,16 @@
 import axios from "axios";
 
-const apiBaseUrl = import.meta.env.VITE_API_URL;
+function getApiBaseUrl() {
+  const configuredUrl = import.meta.env.VITE_API_URL?.trim();
+  const fallbackUrl = "http://localhost:8080/api";
+  const baseUrl = configuredUrl || fallbackUrl;
+  const cleanUrl = baseUrl.replace(/\/+$/, "");
+
+  return cleanUrl.endsWith("/api") ? cleanUrl : `${cleanUrl}/api`;
+}
 
 const api = axios.create({
-  baseURL: apiBaseUrl || "http://localhost:8080/api",
+  baseURL: getApiBaseUrl(),
 });
 
 api.interceptors.request.use((config) => {
