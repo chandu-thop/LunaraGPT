@@ -8,8 +8,20 @@ const authRoute=require("./routes/auth.js");
 
 const app = express();
 app.use(express.json());
+
+const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:5173")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
 app.use(cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+
+        return callback(new Error(`CORS blocked for origin: ${origin}`));
+    },
     credentials: true,
 }));
 
@@ -23,11 +35,20 @@ const PORT = process.env.PORT || 8080;
 
 const connectDB=async(message)=>{
     try{
+        if(!process.env.MONGODB_URL){
+            throw new Error("MONGODB_URL is not configured");
+        }
+
+        if(!process.env.JWT_SECRET){
+            throw new Error("JWT_SECRET is not configured");
+        }
+
         await mongoose.connect(process.env.MONGODB_URL);
         console.log("data is connected succesfuul to db");
 
     }catch(err){
-        console.log(err);
+        console.error("Database connection failed:", err.message);
+        process.exit(1);
     }
 }
 app.get("/",(req,res)=>{

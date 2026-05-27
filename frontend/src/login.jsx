@@ -42,7 +42,7 @@ export default function Login() {
       login(response.data.user || { username: user.username }, response.data.token);
       navigate("/chat");
     } catch (err) {
-      setError(err.response?.data?.error || "Login failed. Please try again.");
+      setError(err.response?.data?.error || err.userMessage || "Login failed. Please try again.");
     } finally {
       setLoading(false);
     }

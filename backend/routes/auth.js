@@ -10,8 +10,15 @@ route.post("/register",async (req,res)=>{
     try{
         console.log("📝 Register request received:", req.body);
          let {username,email,password}=req.body;
+        username = username?.trim();
+        email = email?.trim().toLowerCase();
+
         if(!username||!email||!password){
             return res.status(400).json({error:`Please provide all the required fields`});
+        }
+
+        if(!process.env.JWT_SECRET){
+            return res.status(500).json({error:`Server auth is not configured`});
         }
         
         // Check if user already exists
@@ -44,6 +51,10 @@ route.post("/register",async (req,res)=>{
         });
     }catch(err){
         console.log("❌ Register error:", err.message);
+        if(err.code === 11000){
+            return res.status(400).json({error:`User already exists`});
+        }
+
         return res.status(500).json({error:`Unable to register the user`});
     }
 });
@@ -51,8 +62,14 @@ route.post("/register",async (req,res)=>{
 route.post("/login",async (req,res)=>{
     try{
         let {username,password}=req.body;
+        username = username?.trim().toLowerCase();
+
         if(!username||!password){
             return res.status(400).json({error:`please provide all the required fields`});
+        }
+
+        if(!process.env.JWT_SECRET){
+            return res.status(500).json({error:`Server auth is not configured`});
         }
         const user=await User.findOne({
             $or: [{ username: username }, { email: username }],
