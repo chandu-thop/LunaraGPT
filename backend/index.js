@@ -14,21 +14,43 @@ const defaultClientUrls = [
     "https://lunara-gpt.vercel.app",
 ];
 
-const allowedOrigins = (process.env.CLIENT_URL || defaultClientUrls.join(","))
-    .split(",")
+const allowedOrigins = [
+    ...defaultClientUrls,
+    ...(process.env.CLIENT_URL || "").split(","),
+]
     .map((origin) => origin.trim())
     .filter(Boolean);
 
-app.use(cors({
+const isAllowedOrigin = (origin) => {
+    if (!origin) {
+        return true;
+    }
+
+    try {
+        const { hostname } = new URL(origin);
+        return allowedOrigins.includes(origin) || hostname.endsWith(".vercel.app");
+    } catch {
+        return false;
+    }
+};
+
+const corsOptions = {
     origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
+        if (isAllowedOrigin(origin)) {
             return callback(null, true);
         }
 
         return callback(new Error(`CORS blocked for origin: ${origin}`));
     },
     credentials: true,
-}));
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    optionsSuccessStatus: 204,
+};
+
+app.use(cors(corsOptions));
+
+console.log("Allowed CORS origins:", allowedOrigins);
 
 // Auth routes MUST come first (no authentication required)
 app.use("/api/auth",authRoute);
