@@ -62,11 +62,17 @@ export default function Chatwindow() {
       }
     } catch (err) {
       console.log(err);
+      const errorMessage =
+        err.response?.data?.error ||
+        err.response?.data?.message ||
+        err.userMessage ||
+        "Sorry, I could not send that message. Please try again.";
+
       setPreviousChats((prev) => [
         ...prev,
         {
           role: "assistant",
-          content: "Sorry, I could not send that message. Please try again.",
+          content: errorMessage,
         },
       ]);
     } finally {

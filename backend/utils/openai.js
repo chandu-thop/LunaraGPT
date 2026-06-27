@@ -5,6 +5,9 @@ const OpenAI = require("openai");
 const getopenairesponse = async (message) => {
 
     try {
+        if (!process.env.GROQ_API_KEY) {
+            throw new Error("GROQ_API_KEY is not configured");
+        }
 
         const groq = new OpenAI({
             apiKey: process.env.GROQ_API_KEY,
@@ -27,7 +30,7 @@ const getopenairesponse = async (message) => {
 
         console.log("Groq Error:", err);
 
-        return "AI response failed";
+        throw err;
 
     }
 

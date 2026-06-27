@@ -30,7 +30,6 @@ const ThreadSchema=mongoose.Schema({
     threadId:{
         type:String,
         required:true,
-        unique:true
     },
     title:{
         type:String,
@@ -47,6 +46,8 @@ const ThreadSchema=mongoose.Schema({
     },
 
 });
+
+ThreadSchema.index({userId:1,threadId:1},{unique:true});
 
 
 const Thread=mongoose.model("Thread",ThreadSchema);

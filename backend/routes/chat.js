@@ -87,11 +87,30 @@ route.post("/chat",async (req,res)=>{
         thread.updatedAt=new Date();
         await thread.save();
         res.json({reply:assistantMessage});
+        console.log(assistantMessage);
 
 
     }catch(err){
         console.log(err);
-        res.status(500).json({error:`something went wrong`});
+        const isMissingGroqKey = err.message === "GROQ_API_KEY is not configured";
+        const providerStatus = err.status || err.code;
+        const providerMessage = err.error?.message || err.message;
+
+        let error = "Unable to get an AI response. Check the backend logs for the Groq error.";
+
+        if (isMissingGroqKey) {
+            error = "AI provider is not configured. Set GROQ_API_KEY on the deployed backend.";
+        } else if (providerStatus === 401) {
+            error = "Groq API key is invalid or missing on the deployed backend.";
+        } else if (providerStatus === 429) {
+            error = "Groq rate limit or quota exceeded. Please wait and try again, or check your Groq dashboard.";
+        } else if (providerStatus === 400 && providerMessage) {
+            error = `Groq request failed: ${providerMessage}`;
+        } else if (providerStatus === 404 && providerMessage) {
+            error = `Groq model error: ${providerMessage}`;
+        }
+
+        res.status(500).json({error});
 
     }
 });
